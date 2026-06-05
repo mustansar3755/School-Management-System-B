@@ -83,7 +83,9 @@ schoolSchema.methods.daysRemaining = function () {
 };
 
 // ─── PRE-SAVE HOOK ────────────────────────────────────────────────────────────
-schoolSchema.pre("save", function (next) {
+schoolSchema.pre("save", async function () {
+  // 'this' current processing document ko refer karta hai
+
   if (
     this.subscription?.end_date &&
     new Date() > new Date(this.subscription.end_date) &&
@@ -91,7 +93,6 @@ schoolSchema.pre("save", function (next) {
   ) {
     this.status = "expired";
   }
-  next();
 });
 
 // ─── CRUCIAL FIX FOR COMPASS & REFS ───────────────────────────────────────────
