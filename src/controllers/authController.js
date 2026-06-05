@@ -1,11 +1,13 @@
-
-
 import jwt from "jsonwebtoken";
 import UserModel from "../model/UserModel.js";
 import { AdminModel } from "../model/AdminModel.js";
 import { TeacherModel } from "../model/TeacherModel.js";
 import { StudentModel } from "../model/StudentModel.js";
 
+// ─── IMPORTS FOR MONGOOSE MODEL REGISTRATION ─────────────────────────────────
+// Inhe import karne se Mongoose lifecycle mein schemas internally register ho jayenge
+import SchoolModel from "../model/SchoolModel.js"; 
+import { Section } from "../model/ClassSectionModel.js"; // Agar section ClassModel file mein hai to exact path check kar lein
 
 // JWT Token Generator Helper
 const generateToken = (id) => {
@@ -87,6 +89,7 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ message: "Registration failed", error: error.message });
   }
 };
+
 // ─── LOGIN USER (Universal Login) ────────────────────────────────────────────
 export const loginUser = async (req, res) => {
   try {
@@ -110,10 +113,20 @@ export const loginUser = async (req, res) => {
 
     // 3. User ke role ke mutabiq dynamic profile data fetch karein
     let profileDetails = null;
+    
+    // Crucial: .populate() hamesha lower-case field keys ("school", "section") par chalega
     if (user.role === "superadmin" || user.role === "admin") {
       profileDetails = await AdminModel.findOne({ user: user._id }).populate("school");
-      // Last login timestamp update karein
-      if (profileDetails) await profileDetails.updateLastLogin();
+      
+      // Last login timestamp up-to-date karne ke liye mongoose save fallback logic
+      if (profileDetails) {
+        if (typeof profileDetails.updateLastLogin === "function") {
+          await profileDetails.updateLastLogin();
+        } else {
+          profileDetails.lastLogin = new Date();
+          await profileDetails.save();
+        }
+      }
     } else if (user.role === "teacher") {
       profileDetails = await TeacherModel.findOne({ user: user._id }).populate("school");
     } else if (user.role === "student") {

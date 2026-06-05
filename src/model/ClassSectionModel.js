@@ -40,7 +40,7 @@ const sectionSchema = new mongoose.Schema(
     },
     class: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
+      ref: "ClassModel",
       required: true, // Diagram: class_id (NN)
     },
     name: {
@@ -53,7 +53,7 @@ const sectionSchema = new mongoose.Schema(
     },
     classTeacher: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher", // Yeh field extra hai (diagram main nahi hai, pr logic wise theek hai agar aap rakhna chahein)
+      ref: "TeacherModel", // Yeh field extra hai (diagram main nahi hai, pr logic wise theek hai agar aap rakhna chahein)
     },
     isActive: { 
       type: Boolean, 

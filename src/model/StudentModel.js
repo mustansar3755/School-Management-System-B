@@ -9,7 +9,7 @@ const studentSchema = new mongoose.Schema(
     },
     section: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Section",
+      ref: "SectionModel",
       required: true, // Diagram: section_id (NN)
     },
     name: {
